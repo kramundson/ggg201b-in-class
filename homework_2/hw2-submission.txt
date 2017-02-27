@@ -98,7 +98,7 @@ Assembly with either quality-trimmed or untrimmed reads produced the same number
 at all sizes listed. Both total length of the assembly and contig length by benchmark size
 are lower for the assembly using quality-trimmed reads. 
 
-Approximately 8300 reads were discarded by Trimmomatic:
+Approximately 4000 reads were discarded by Trimmomatic:
 
 ```
 grep -c "^@EAS" *.fq *.fastq
@@ -112,7 +112,7 @@ ecoli_ref-5M-R2-trim.fq:2495801
 ecoli_ref-5m.fastq:5000000
 ```
 
-Since some ~8300 reads were discarded by Trimmomatic, we might expect the total length of the
+Since some reads were discarded by Trimmomatic, we might expect the total length of the
 assembly to decrease due to loss of information.
 The slight decrease in total assembly length (192bp) indicates that most of the reads we 
 threw away did not have much of an effect on the assembly length.
