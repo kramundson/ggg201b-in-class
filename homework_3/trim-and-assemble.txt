@@ -1,0 +1,91 @@
+##Homework assignment 3: Add at least two more ```wt``` and two ```mut``` datasets to the lab8 analysis.
+
+# Done on an AWS instance m4.xlarge running AMI 2017-01-20-ubuntu-wily-titus-ucdavis-dragon (ami-c72d7fa7)
+
+# 0. Build necessary software:edgeR, salmon
+
+## edgeR
+cd
+git clone https://github.com/ctb/2017-ucdavis-igg201b.git
+sudo Rscript --no-save ~/2017-ucdavis-igg201b/lab7/install-edgeR.R
+
+## salmon
+cd
+curl -L -O https://github.com/COMBINE-lab/salmon/releases/download/v0.8.0/Salmon-0.8.0_linux_x86_64.tar.gz
+tar xzf Salmon-0.8.0_linux_x86_64.tar.gz
+export PATH=$PATH:$HOME/Salmon-latest_linux_x86_64/bin
+
+#1. Initialize directory
+mkdir ~/hw3
+cd ~/hw3
+
+#2. Download necessary files: SRA records from Lab 8.
+
+curl -O ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR458/ERR458500/ERR458500.fastq.gz
+curl -O ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR458/ERR458501/ERR458501.fastq.gz
+curl -O ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR458/ERR458502/ERR458502.fastq.gz
+curl -O ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR458/ERR458493/ERR458493.fastq.gz
+curl -O ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR458/ERR458494/ERR458494.fastq.gz
+curl -O ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR458/ERR458495/ERR458495.fastq.gz
+
+#3. I picked four entries by eye from the table. All are also from BioRep1, as are the other six from lab8.
+
+# Rows chosen:
+#ERR458498 (row 9, WT)
+#ERR458499 (row 8, WT)
+#ERR458506 (row 15, mut)
+#ERR458507 (row 16, mut)
+
+# Download data from ENA:
+curl -O ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR458/ERR458498/ERR458498.fastq.gz
+curl -O ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR458/ERR458499/ERR458499.fastq.gz
+curl -O ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR458/ERR458506/ERR458506.fastq.gz
+curl -O ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR458/ERR458507/ERR458507.fastq.gz
+
+#6. Download necessary files: Yeast reference transcriptome.
+
+curl -O http://downloads.yeastgenome.org/sequence/S288C_reference/orf_dna/orf_coding.fasta.gz
+
+#7. Index yeast reference transcriptome: Done.
+
+salmon index --index yeast_orfs --type quasi --transcripts orf_coding.fasta.gz
+
+#8. Run salmon on all samples: Done
+
+for i in *.fastq.gz
+do
+    salmon quant -i yeast_orfs --libType U -r $i -o $i.quant --seqBias --gcBias
+done
+
+# 9. Collect all of sample counts.
+
+curl -L -O https://github.com/ngs-docs/2016-aug-nonmodel-rnaseq/raw/master/files/gather-counts.py
+python2 gather-counts.py
+
+#10. Run edgeR (in R) and analyze output.
+
+# cp -n ~/2017-ucdavis-igg201b/lab7/yeast.salmon.R ./ # don't overwrite!
+
+###EDIT ./yeast.salmon.R to accommodate new files, saved as ./yeast.salmon-hw3.R###
+
+# View differences between old and new files with diff
+diff ./yeast.salmon-hw3.R ~/2017-ucdavis-igg201b/lab7/yeast.salmon.R > diff-yeast.salmon.txt
+Rscript ./yeast.salmon-hw3.R
+
+##11. Evaluate how many genes were gained and lost at 0.05 FDR, compare to lab8
+
+# hw3 edgeR output:
+awk 'BEGIN {FS = ","} ; {if ($5 <= 0.05) print $0}' ./yeast-edgeR.csv | grep -cv ",\"FDR"
+# 4294
+
+# lab8 edgeR output:
+awk 'BEGIN {FS = ","} ; {if ($5 <= 0.05) print $0}' ~/2017-ucdavis-igg201b/lab8/yeast-edgeR.csv | grep -cv ",\"FDR"
+# 4030
+
+# sanity check
+grep ",\"FDR" yeast-edgeR.csv
+grep ",\"FDR" ~/2017-ucdavis-igg201b/lab8/yeast-edgeR.csv
+# both return only the header row
+
+# Conclusion: Adding two sets of wild-type reads (ERR458498 and ERR458499) and two sets of
+# mutant reads (ERR458506 and ERR458507) called 264 more DEGs at FDR <= 0.05.

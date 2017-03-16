@@ -1,0 +1,9 @@
+Done on an AWS instance m4.xlarge running AMI 2017-01-20-ubuntu-wily-titus-ucdavis-dragon (ami-c72d7fa7)
+
+1. Initialize directory
+
+```
+mkdir ~/hw3
+cd ~/hw3
+```
+
