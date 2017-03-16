@@ -54,51 +54,51 @@ R1 and R2 files contain the expected number of reads, and ecoli_ref-5M-orphans.f
 rm ecoli_ref-5M-orphans.fq
 ```
 
-8. Quality trim with Trimmomatic
+9. Quality trim with Trimmomatic
 ```
 TrimmomaticPE ecoli_ref-5M-R1.fq ecoli_ref-5M-R2.fq ecoli_ref-5M-R1-trim.fq \
 ecoli_ref-5M-R1-orphan.fq ecoli_ref-5M-R2-trim.fq ecoli_ref-5M-R2-orphan.fq \
 ILLUMINACLIP:TruSeq3-PE.fa:2:40:15 LEADING:2 TRAILING:2 SLIDINGWINDOW:4:2 MINLEN:25
 ```
 
-9. Combine orphan reads into one file
+10. Combine orphan reads into one file
 ```
 cat *orphan* >> ecoli_ref-5M-orphan.fq
 ```
 
-9. MEGAHIT Assembly
+11. MEGAHIT Assembly
 ```
 ~/megahit/megahit -1 ecoli_ref-5M-R1-trim.fq -2 ecoli_ref-5M-R2-trim.fq \
 -r ecoli_ref-5M-orphan.fq
 ```
 
-10. Install QUAST
+12. Install QUAST
 ```
 cd ~
 git clone https://github.com/ablab/quast.git -b release_4.2
 export PYTHONPATH=$(pwd)/quast/libs/
 ```
 
-11. Save assembly
+13. Save assembly
 ```
 cd ~/hw2/megahit_out/
 cp final.contigs.fa ecoli-hw2-assembly.fa
 ```
 
-12. Run QUAST on assembly
+14. Run QUAST on assembly
 ```
 python2.7 ~/quast/quast.py ecoli-hw2-assembly.fa -o ecoli-hw2-report
 ```
 
-13. Look at assembly statistics in browser. Path:
+15. Look at assembly statistics in browser. Path:
 ~/hw2/megahit_out/ecoli-hw2-report/report.txt
 
-Interpretation:
+16. Interpretation:
 Assembly with either quality-trimmed or untrimmed reads produced the same number of contigs
 at all sizes listed. Both total length of the assembly and contig length by benchmark size
 are lower for the assembly using quality-trimmed reads. 
 
-Approximately 8300 reads were discarded by Trimmomatic:
+Approximately 4000 reads were discarded by Trimmomatic:
 
 ```
 grep -c "^@EAS" *.fq *.fastq
@@ -112,7 +112,7 @@ ecoli_ref-5M-R2-trim.fq:2495801
 ecoli_ref-5m.fastq:5000000
 ```
 
-Since some ~8300 reads were discarded by Trimmomatic, we might expect the total length of the
+Since some reads were discarded by Trimmomatic, we might expect the total length of the
 assembly to decrease due to loss of information.
 The slight decrease in total assembly length (192bp) indicates that most of the reads we 
 threw away did not have much of an effect on the assembly length.
