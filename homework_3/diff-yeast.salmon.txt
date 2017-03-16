@@ -1,0 +1,23 @@
+6,8d5
+< "ERR458495.fastq.gz.quant.counts",
+< "ERR458498.fastq.gz.quant.counts",
+< "ERR458499.fastq.gz.quant.counts",
+10,13c7
+< "ERR458501.fastq.gz.quant.counts",
+< "ERR458502.fastq.gz.quant.counts",
+< "ERR458506.fastq.gz.quant.counts",
+< "ERR458507.fastq.gz.quant.counts"    
+---
+> "ERR458501.fastq.gz.quant.counts"
+16c10
+< labels=c("93", "94", "95", "98", "99", "00", "01", "02", "06", "07")
+---
+> labels=c("A", "B", "C", "D")
+24c18
+< group <- c(rep("WT",5), rep("Mut",5))
+---
+> group <- c(rep("I",2), rep("II",2))
+32c26
+< et <- exactTest(dge, pair=c("WT", "Mut"))
+---
+> et <- exactTest(dge, pair=c("I", "II"))
